@@ -1,4 +1,4 @@
-patient_id,date_of_admission,billing_amount,room_number,admission_type,discharge_date,test_results,visit_id,physician_id,provider_id,hospital_id,chief_complaint,treatment_description,primary_diagnosis,visit_status
+patient_id,date_of_admission,billing_amount,room_number,admission_type,discharge_date,test_results,visit_id,physician_id,payer_id,hospital_id,chief_complaint,treatment_description,primary_diagnosis,visit_status
 0,2022-11-17,37490.98336352819,146,Elective,2022-12-01,Inconclusive,0,102,1,0,,,,DISCHARGED
 1,2023-06-01,47304.06484547511,404,Emergency,,Normal,1,435,4,5,,,,OPEN
 2,2019-01-09,36874.89699661277,292,Emergency,2019-02-08,Normal,2,348,2,6,,,,DISCHARGED
