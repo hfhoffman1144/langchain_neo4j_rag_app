@@ -1,2 +1,2 @@
 chroma_data/
-rag_api/.env
+*.env
