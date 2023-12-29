@@ -45,17 +45,28 @@ RETURN phy.name AS physician_name, SUM(c.billing_amount) AS total_billed
 ORDER BY total_billed 
 LIMIT 1
 
+# Which state had the largest percent increase in Cigna visits from 2022 to 2023?
+MATCH (h:Hospital)<-[:AT]-(v:Visit)-[:COVERED_BY]->(p:Payer)
+WHERE p.name = 'Cigna' AND v.admission_date >= '2022-01-01' AND v.admission_date < '2024-01-01'
+WITH h.state_name AS state, COUNT(v) AS visit_count, 
+     SUM(CASE WHEN v.admission_date >= '2022-01-01' AND v.admission_date < '2023-01-01' THEN 1 ELSE 0 END) AS count_2022,
+     SUM(CASE WHEN v.admission_date >= '2023-01-01' AND v.admission_date < '2024-01-01' THEN 1 ELSE 0 END) AS count_2023
+WITH state, visit_count, count_2022, count_2023,
+     (toFloat(count_2023) - toFloat(count_2022)) / toFloat(count_2022) * 100 AS percent_increase
+RETURN state, percent_increase
+ORDER BY percent_increase DESC
+LIMIT 1
+
 String category values:
 Test results are one of: 'Inconclusive', 'Normal', 'Abnormal'
 Visit statuses are one of: 'OPEN', 'DISCHARGED'
 Admission Types are one of: 'Elective', 'Emergency', 'Urgent'
-Payer names are one of: 'Cigna', 'Blue Cross', 'UnitedHealthcare', 'Medicaid', 'Aetna'
+Payer names are one of: 'Cigna', 'Blue Cross', 'UnitedHealthcare', 'Medicare', 'Aetna'
 
 A visit is considered open if it's status is 'OPEN' and the discharge date is missing
 
 Make sure to use IS NULL or IS NOT NULL when analyzing missing properties.
 Never return embedding properties in your queries. You must never include the statement "GROUP BY" in your query.
-Do not apply filters to your cypher query that are not derived from the question. 
 
 The question is:
 {question}
@@ -98,5 +109,6 @@ hospital_cypher_chain = GraphCypherQAChain.from_llm(
     verbose=True,
     qa_prompt=qa_generation_prompt,
     cypher_prompt=cypher_generation_prompt,
-    validate_cypher=True
+    validate_cypher=True,
+    top_k=100
 )

@@ -14,7 +14,9 @@ tools = [
         description="""
         Useful when you need to answer questions about patient reviews or experiences. 
         Not useful for answering objective questions that involve counting or aggregation.
-        Use full question as input.
+        Use the entire prompt as input to the tool. For instance, if the prompt is
+        "Are patients satisfied with their care?", the input should be "Are patients
+        satisfied with their care?".
         """,
     ),
     Tool(
@@ -22,7 +24,9 @@ tools = [
         func=hospital_cypher_chain.run,
         description="""
         Useful for answering questions about patients, physiscians, hospitals, insurance 
-        payers, and hospital visit details. Use full question as input.
+        payers, and hospital visit details. Use the entire prompt as input to the tool. 
+        For instance, if the prompt is "How many visits have there been?", the input
+        should be "How many visits have there been?".
         """,
     ),
     Tool(

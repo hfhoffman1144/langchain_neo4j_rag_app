@@ -1,0 +1,11 @@
+- $list hospitals doesn't list all of them
+- $Wait times function call messes up when you include the word "hospital"
+- $medicaid state percent increase query is giving stochastic answers.
+- Chatbot can be very sensitive to question wording.
+- remember to black format.
+- $How many years has it been since Dr. Michael Delgado graduated medical school? Sensitive to doctor name.
+-  Add async functionality to agent and api endpoint
+- Finish docstrings
+- Get most available hospital
+- Poetry refactor?
+
