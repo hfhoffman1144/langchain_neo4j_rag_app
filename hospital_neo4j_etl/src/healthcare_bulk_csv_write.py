@@ -69,7 +69,9 @@ def load_healthcare_graph_from_csv() -> None:
         query = f"""
         LOAD CSV WITH HEADERS 
         FROM '{HOSPITALS_CSV_PATH}' AS hospitals
-        MERGE (h:Hospital {{id: toInteger(hospitals.hospital_id), name: hospitals.hospital_name}});
+        MERGE (h:Hospital {{id: toInteger(hospitals.hospital_id),
+                            name: hospitals.hospital_name,
+                            state_name: hospitals.hospital_state}});
         """
         _ = session.run(query, {})
 
@@ -215,76 +217,3 @@ def load_healthcare_graph_from_csv() -> None:
 
 if __name__ == "__main__":
     load_healthcare_graph_from_csv()
-
-    
-
-
-
-    
-""" 
-  
-
-
-LOAD CSV WITH HEADERS FROM ($file_path_root + $file_1) AS row
-WITH row 
-CALL {
-  WITH row
-  MATCH (source: `Physician` { `id`: toInteger(trim(row.`physician_id`)) })
-  MATCH (target: `Visit` { `id`: toInteger(trim(row.`visit_id`)) })
-  MERGE (source)-[r: `TREATS`]->(target)
-} IN TRANSACTIONS OF 10000 ROWS;
-
-LOAD CSV WITH HEADERS FROM ($file_path_root + $file_1) AS row
-WITH row 
-CALL {
-  WITH row
-  MATCH (source: `Hospital` { `id`: toInteger(trim(row.`visit_id`)) })
-  MATCH (target: `Physician` { `id`: toInteger(trim(row.`hospital_id`)) })
-  MERGE (source)-[r: `EMPLOYS`]->(target)
-} IN TRANSACTIONS OF 10000 ROWS;
-
-LOAD CSV WITH HEADERS FROM ($file_path_root + $file_1) AS row
-WITH row 
-CALL {
-  WITH row
-  MATCH (source: `Hospital` { `id`: toInteger(trim(row.`hospital_id`)) })
-  MATCH (target: `Payer` { `id`: toInteger(trim(row.`payer_id`)) })
-  MERGE (source)-[r: `BILLS`]->(target)
-  SET r.`amount` = toFloat(trim(row.`billing_amount`))
-  // Your script contains the datetime datatype. Our app attempts to convert dates to ISO 8601 date format before passing them to the Cypher function.
-  // This conversion cannot be done in a Cypher script load. Please ensure that your CSV file columns are in ISO 8601 date format to ensure equivalent loads.
-  // SET r.`billing_date` = datetime(row.`discharge_date`)
-} IN TRANSACTIONS OF 10000 ROWS;
-
-LOAD CSV WITH HEADERS FROM ($file_path_root + $file_1) AS row
-WITH row 
-CALL {
-  WITH row
-  MATCH (source: `Visit` { `id`: toInteger(trim(row.`visit_id`)) })
-  MATCH (target: `Payer` { `id`: toInteger(trim(row.`payer_id`)) })
-  MERGE (source)-[r: `COVERED_BY`]->(target)
-  // Your script contains the datetime datatype. Our app attempts to convert dates to ISO 8601 date format before passing them to the Cypher function.
-  // This conversion cannot be done in a Cypher script load. Please ensure that your CSV file columns are in ISO 8601 date format to ensure equivalent loads.
-  // SET r.`service_date` = datetime(row.`discharge_date`)
-} IN TRANSACTIONS OF 10000 ROWS;
-
-LOAD CSV WITH HEADERS FROM ($file_path_root + $file_1) AS row
-WITH row 
-CALL {
-  WITH row
-  MATCH (source: `Patient` { `id`: toInteger(trim(row.`patient_id`)) })
-  MATCH (target: `Visit` { `id`: toInteger(trim(row.`visit_id`)) })
-  MERGE (source)-[r: `HAS`]->(target)
-} IN TRANSACTIONS OF 10000 ROWS;
-
-LOAD CSV WITH HEADERS FROM ($file_path_root + $file_5) AS row
-WITH row 
-CALL {
-  WITH row
-  MATCH (source: `Visit` { `id`: toInteger(trim(row.`visit_id`)) })
-  MATCH (target: `Review` { `id`: toInteger(trim(row.`review_id`)) })
-  MERGE (source)-[r: `WRITES`]->(target)
-} IN TRANSACTIONS OF 10000 ROWS;
-
-   
-   """

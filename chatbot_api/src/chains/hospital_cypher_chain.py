@@ -49,12 +49,13 @@ String category values:
 Test results are one of: 'Inconclusive', 'Normal', 'Abnormal'
 Visit statuses are one of: 'OPEN', 'DISCHARGED'
 Admission Types are one of: 'Elective', 'Emergency', 'Urgent'
-Payer names are one of: 'Cigna', 'Blue Cross', 'UnitedHealthcare', 'Medicare', 'Aetna'
+Payer names are one of: 'Cigna', 'Blue Cross', 'UnitedHealthcare', 'Medicaid', 'Aetna'
 
 A visit is considered open if it's status is 'OPEN' and the discharge date is missing
 
 Make sure to use IS NULL or IS NOT NULL when analyzing missing properties.
 Never return embedding properties in your queries. You must never include the statement "GROUP BY" in your query.
+Do not apply filters to your cypher query that are not derived from the question. 
 
 The question is:
 {question}
@@ -80,7 +81,8 @@ Question:
 If the provided information is empty, say that you don't know the answer.
 Empty information looks like this: []
 
-If the information is not empty, you must provide an answer.
+If the information is not empty, you must provide an answer. If the question involves a time duration,
+assume this duration is in days unless otherwise specified.
 
 Helpful Answer:
 """
@@ -89,8 +91,8 @@ qa_generation_prompt = PromptTemplate(
     input_variables=["context", "question"], template=qa_generation_template
 )
 
-cypher_chain = GraphCypherQAChain.from_llm(
-    cypher_llm = ChatOpenAI(model="gpt-3.5-turbo", temperature=0),
+hospital_cypher_chain = GraphCypherQAChain.from_llm(
+    cypher_llm = ChatOpenAI(model="gpt-3.5-turbo-1106", temperature=0),
     qa_llm = ChatOpenAI(model="gpt-3.5-turbo", temperature=0),
     graph=graph,
     verbose=True,

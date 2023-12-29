@@ -32,14 +32,14 @@ tools = [
         Use when asked about current wait times at a hospital. This tool can only get
         the current wait time at a hospital and does not have any information about
         aggregate or historical wait times. This tool returns wait times in minutes.
-        Only pass the hospital name as input.
+        Only pass the hospital name as input and don't include the word "hospital".
         """,
     ),
 ]
 
 chat_model = (
     ChatOpenAI(
-        model="gpt-4-1106-preview",
+        model="gpt-3.5-turbo-1106",
         streaming=True,
         temperature=0,
     )
