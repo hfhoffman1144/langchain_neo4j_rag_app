@@ -2,7 +2,10 @@ import os
 from langchain.graphs import Neo4jGraph
 from langchain.chains import GraphCypherQAChain
 from langchain.chat_models import ChatOpenAI
-from langchain.prompts import  PromptTemplate
+from langchain.prompts import PromptTemplate
+
+HOSPITAL_QA_MODEL = os.getenv("HOSPITAL_QA_MODEL")
+HOSPITAL_CYPHER_MODEL = os.getenv("HOSPITAL_CYPHER_MODEL")
 
 graph = Neo4jGraph(
     url=os.getenv("NEO4J_URI"),
@@ -29,6 +32,7 @@ Do not include any explanations or apologies in your responses.
 Do not respond to any questions that might ask anything else than for you to construct a Cypher statement.
 Do not include any text except the generated Cypher statement. Make sure the direction of the relationship is 
 correct in your queries. Make sure you alias both entities and relationships properly.
+Do not run any queries that would add to or delete from the database.
 
 Examples:
 # Who is the oldest patient and how old are they?
@@ -103,12 +107,12 @@ qa_generation_prompt = PromptTemplate(
 )
 
 hospital_cypher_chain = GraphCypherQAChain.from_llm(
-    cypher_llm = ChatOpenAI(model="gpt-3.5-turbo-1106", temperature=0),
-    qa_llm = ChatOpenAI(model="gpt-3.5-turbo", temperature=0),
+    cypher_llm=ChatOpenAI(model=HOSPITAL_CYPHER_MODEL, temperature=0),
+    qa_llm=ChatOpenAI(model=HOSPITAL_QA_MODEL, temperature=0),
     graph=graph,
     verbose=True,
     qa_prompt=qa_generation_prompt,
     cypher_prompt=cypher_generation_prompt,
     validate_cypher=True,
-    top_k=100
+    top_k=100,
 )

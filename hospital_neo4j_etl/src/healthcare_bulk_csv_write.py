@@ -151,7 +151,6 @@ def load_healthcare_graph_from_csv() -> None:
 
     LOGGER.info("Loading 'AT' relationships")
     with driver.session(database="neo4j") as session:
-        
         query = f"""  
         LOAD CSV WITH HEADERS FROM '{VISITS_CSV_PATH}' AS row
         MATCH (source: `Visit` {{ `id`: toInteger(trim(row.`visit_id`)) }})
@@ -159,8 +158,7 @@ def load_healthcare_graph_from_csv() -> None:
         MERGE (source)-[r: `AT`]->(target)
         """
         _ = session.run(query, {})
-    
-        
+
     LOGGER.info("Loading 'WRITES' relationships")
     with driver.session(database="neo4j") as session:
         query = f"""
@@ -193,8 +191,7 @@ def load_healthcare_graph_from_csv() -> None:
                 covered_by.billing_amount = toFloat(visits.billing_amount)
         """
         _ = session.run(query, {})
-    
-    
+
     LOGGER.info("Loading 'HAS' relationships")
     with driver.session(database="neo4j") as session:
         query = f"""
@@ -204,7 +201,7 @@ def load_healthcare_graph_from_csv() -> None:
             MERGE (p)-[has:HAS]->(v)
         """
         _ = session.run(query, {})
-    
+
     LOGGER.info("Loading 'EMPLOYS' relationships")
     with driver.session(database="neo4j") as session:
         query = f"""
@@ -214,6 +211,7 @@ def load_healthcare_graph_from_csv() -> None:
             MERGE (h)-[employs:EMPLOYS]->(p)
         """
         _ = session.run(query, {})
+
 
 if __name__ == "__main__":
     load_healthcare_graph_from_csv()

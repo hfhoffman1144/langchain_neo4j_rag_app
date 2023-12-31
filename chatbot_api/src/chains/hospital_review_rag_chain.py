@@ -10,6 +10,8 @@ from langchain.prompts import (
     ChatPromptTemplate,
 )
 
+HOSPITAL_QA_MODEL = os.getenv("HOSPITAL_QA_MODEL")
+
 
 vector_index = Neo4jVector.from_existing_graph(
     OpenAIEmbeddings(),
@@ -45,7 +47,7 @@ review_prompt = ChatPromptTemplate(
 )
 
 reviews_vector_qa = RetrievalQA.from_chain_type(
-    llm=ChatOpenAI(model="gpt-3.5-turbo", temperature=0),
+    llm=ChatOpenAI(model=HOSPITAL_QA_MODEL, temperature=0),
     chain_type="stuff",
     retriever=vector_index.as_retriever(k=12),
 )

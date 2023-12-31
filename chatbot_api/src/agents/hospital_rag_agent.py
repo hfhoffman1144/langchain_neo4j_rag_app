@@ -1,10 +1,9 @@
 from langchain.chat_models import ChatOpenAI
 from langchain.agents import initialize_agent, Tool
 from langchain.agents import AgentType
-from langchain.callbacks.streaming_stdout import StreamingStdOutCallbackHandler
 from chains.hospital_review_rag_chain import reviews_vector_qa
 from chains.hospital_cypher_chain import hospital_cypher_chain
-from tools.wait_times import get_current_wait_times
+from tools.wait_times import get_current_wait_times, find_most_available_hospital
 
 
 tools = [
@@ -33,20 +32,27 @@ tools = [
         name="Waits",
         func=get_current_wait_times,
         description="""
-        Use when asked about current wait times at a hospital. This tool can only get
+        Use when asked about current wait times at a specific hospital. This tool can only get
         the current wait time at a hospital and does not have any information about
         aggregate or historical wait times. This tool returns wait times in minutes.
-        Only pass the hospital name as input and don't include the word "hospital".
+        Do not pass the word "hospital" as input, only the hospital name itself.
+        """,
+    ),
+    Tool(
+        name="Availability",
+        func=find_most_available_hospital,
+        description="""
+        Use when you need to find out which hospital has the shortest weight time. This tool 
+        does not have any information about aggregate or historical wait times. This tool returns a
+        dictionary with the hospital name as the key and the wait time in minutes as the value.
         """,
     ),
 ]
 
-chat_model = (
-    ChatOpenAI(
-        model="gpt-3.5-turbo-1106",
-        streaming=True,
-        temperature=0,
-    )
+chat_model = ChatOpenAI(
+    model="gpt-3.5-turbo-1106",
+    streaming=True,
+    temperature=0,
 )
 
 hospital_rag_agent = initialize_agent(
@@ -54,4 +60,5 @@ hospital_rag_agent = initialize_agent(
     chat_model,
     agent=AgentType.OPENAI_FUNCTIONS,
     verbose=True,
+    return_intermediate_steps=True,
 )
