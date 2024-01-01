@@ -1,9 +1,9 @@
 import os
 import logging
-from retry import retry
 from fastapi import FastAPI
 from agents.hospital_rag_agent import hospital_rag_agent
 from models.hospital_rag_query import HospitalQueryInput, HospitalQueryOutput
+from utils.async_utils import async_retry
 
 logging.basicConfig(
     level=logging.INFO,
@@ -27,7 +27,7 @@ app = FastAPI(
     description="Endpoints for a hospital graph RAG chatbot",
 )
 
-@retry(tries=10, delay=1)
+@async_retry(max_retries=10, delay=1)
 async def invoke_agent_with_retry(query: str):
     """Retry the agent if a tool fails to run. This can help when there
     are intermitten connect issues to external APIs."""
