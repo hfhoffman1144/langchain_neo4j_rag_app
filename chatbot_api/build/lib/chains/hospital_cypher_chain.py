@@ -1,7 +1,7 @@
 import os
 from langchain.graphs import Neo4jGraph
 from langchain.chains import GraphCypherQAChain
-from langchain_openai import ChatOpenAI
+from langchain.chat_models import ChatOpenAI
 from langchain.prompts import PromptTemplate
 
 HOSPITAL_QA_MODEL = os.getenv("HOSPITAL_QA_MODEL")
@@ -14,6 +14,7 @@ graph = Neo4jGraph(
 )
 
 graph.refresh_schema()
+
 
 cypher_generation_template = """
 Task:
@@ -67,7 +68,6 @@ Admission Types are one of: 'Elective', 'Emergency', 'Urgent'
 Payer names are one of: 'Cigna', 'Blue Cross', 'UnitedHealthcare', 'Medicare', 'Aetna'
 
 A visit is considered open if it's status is 'OPEN' and the discharge date is missing
-Use abbreviations when filtering on hospital states (e.g. "Texas" is "TX")
 
 Make sure to use IS NULL or IS NOT NULL when analyzing missing properties.
 Never return embedding properties in your queries. You must never include the statement "GROUP BY" in your query.
@@ -82,23 +82,22 @@ cypher_generation_prompt = PromptTemplate(
 
 qa_generation_template = """
 You are an assistant that takes the results from a Neo4j Cypher query and forms
-a human-readable response. The information section contains the results
+a nice human-understandable response. The information section contains the results
 of a Cypher query that was generated based on a users natural language question. 
-The provided information is authoritative, you must never doubt it or try to use 
-your internal knowledge to correct it. Make the answer sound like a response to the question. 
+The provided information is authoritative, you must never doubt it or try to use your internal knowledge to correct it.
+Make the answer sound as a response to the question. 
 
-Query Results:
+Information:
 {context}
 
 Question:
 {question}
 
-If the provided information is empty, say you don't know the answer.
+If the provided information is empty, say that you don't know the answer.
 Empty information looks like this: []
 
-If the information is not empty, you must provide an answer. If the 
-question involves a time duration, assume this duration is in days 
-unless otherwise specified.
+If the information is not empty, you must provide an answer. If the question involves a time duration,
+assume this duration is in days unless otherwise specified.
 
 Helpful Answer:
 """

@@ -7,7 +7,7 @@ from langchain.graphs import Neo4jGraph
 def get_current_wait_times(
     hospital: str, validate_hospital: bool = True
 ) -> str | float:
-    """Get the current wait time at a hospital"""
+    """TODO"""
 
     if validate_hospital:
         graph = Neo4jGraph(
@@ -18,9 +18,9 @@ def get_current_wait_times(
 
         current_hospitals = graph.query(
             """
-            MATCH (h:Hospital)
-            RETURN h.name AS hospital_name 
-            """
+                                        MATCH (h:Hospital)
+                                        RETURN h.name AS hospital_name 
+                                        """
         )
 
         current_hospitals = [d["hospital_name"].lower() for d in current_hospitals]
@@ -32,7 +32,7 @@ def get_current_wait_times(
 
 
 def find_most_available_hospital(dummy_input: Any) -> dict[str, float]:
-    """Find the hospital with the shortest wait time"""
+    """TODO"""
 
     graph = Neo4jGraph(
         url=os.getenv("NEO4J_URI"),
@@ -42,9 +42,9 @@ def find_most_available_hospital(dummy_input: Any) -> dict[str, float]:
 
     current_hospitals = graph.query(
         """
-        MATCH (h:Hospital)
-        RETURN h.name AS hospital_name 
-        """
+                                    MATCH (h:Hospital)
+                                    RETURN h.name AS hospital_name 
+                                    """
     )
 
     current_hospitals = [d["hospital_name"].lower() for d in current_hospitals]

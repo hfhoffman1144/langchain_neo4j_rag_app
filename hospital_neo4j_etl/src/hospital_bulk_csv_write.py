@@ -3,7 +3,7 @@ import logging
 from retry import retry
 from neo4j import GraphDatabase
 
-# Paths to CSV files containing structured healthcare data
+# Paths to CSV files containing hospital data
 HOSPITALS_CSV_PATH = os.getenv("HOSPITALS_CSV_PATH")
 PAYERS_CSV_PATH = os.getenv("PAYERS_CSV_PATH")
 PHYSICIANS_CSV_PATH = os.getenv("PHYSICIANS_CSV_PATH")
@@ -28,8 +28,8 @@ LOGGER = logging.getLogger(__name__)
 
 
 @retry(tries=100, delay=10)
-def load_healthcare_graph_from_csv() -> None:
-    """Load structured healthcare CSV data following a specific ontology into Neo4j"""
+def load_hospital_graph_from_csv() -> None:
+    """Load structured hospital CSV data following a specific ontology into Neo4j"""
 
     driver = GraphDatabase.driver(NEO4J_URI, auth=(NEO4J_USERNAME, NEO4J_PASSWORD))
 
@@ -214,4 +214,4 @@ def load_healthcare_graph_from_csv() -> None:
 
 
 if __name__ == "__main__":
-    load_healthcare_graph_from_csv()
+    load_hospital_graph_from_csv()

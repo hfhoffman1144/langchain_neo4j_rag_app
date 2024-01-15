@@ -12,8 +12,9 @@ from langchain.prompts import (
 
 HOSPITAL_QA_MODEL = os.getenv("HOSPITAL_QA_MODEL")
 
-neo4j_vector_index = Neo4jVector.from_existing_graph(
-    embedding=OpenAIEmbeddings(),
+
+vector_index = Neo4jVector.from_existing_graph(
+    OpenAIEmbeddings(),
     url=os.getenv("NEO4J_URI"),
     username=os.getenv("NEO4J_USERNAME"),
     password=os.getenv("NEO4J_PASSWORD"),
@@ -45,9 +46,9 @@ review_prompt = ChatPromptTemplate(
     input_variables=["context", "question"], messages=messages
 )
 
-reviews_vector_chain = RetrievalQA.from_chain_type(
+reviews_vector_qa = RetrievalQA.from_chain_type(
     llm=ChatOpenAI(model=HOSPITAL_QA_MODEL, temperature=0),
     chain_type="stuff",
-    retriever=neo4j_vector_index.as_retriever(k=12),
+    retriever=vector_index.as_retriever(k=12),
 )
-reviews_vector_chain.combine_documents_chain.llm_chain.prompt = review_prompt
+reviews_vector_qa.combine_documents_chain.llm_chain.prompt = review_prompt
