@@ -12,9 +12,9 @@ app = FastAPI(
 async def invoke_agent_with_retry(query: str):
     """
     Retry the agent if a tool fails to run. This can help when there
-    are intermitten connect issues to external APIs.
+    are intermittent connection issues to external APIs.
     """
-
+    
     return await hospital_rag_agent_executor.ainvoke({"input": query})
 
 @app.get("/")

@@ -32,6 +32,14 @@ with st.sidebar:
     st.markdown(
         "- Which state had the largest percent increase in medicaid visits from 2022 to 2023?"
     )
+    st.markdown("- What is the average billing amount per day for Aetna patients?")
+    st.markdown("- What was the percent change in average billing amount by state from 2022 to 2023?")
+    st.markdown("- How many reviews have been written from patients in Florida?")
+    st.markdown("- For visits that are not missing chief complaints, what percentage have reviews?")
+    st.markdown("- What is the percentage of visits that have reviews for each hospital?")
+    st.markdown("- Which physician has received the most reviews for this visits they've attended?")
+    st.markdown("- What is the ID for physician James Cooper?")
+    st.markdown("- Show me the reviews for visits treated by physician 270?")
 
 
 st.title("Hospital System Chatbot")
@@ -68,7 +76,7 @@ if prompt := st.chat_input("What do you want to know?"):
 
         else:
             output_text = (
-                "An error occurred while processing your query. Please try again."
+                "An error occurred while processing your message. Please try again or rephrase your message."
             )
             explanation = output_text
 

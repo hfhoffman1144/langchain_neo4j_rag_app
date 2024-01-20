@@ -26,17 +26,19 @@ Do not use any other relationship types or properties that are not provided.
 Schema:
 {schema}
 
-Note: 
+Note:
 Do not include any explanations or apologies in your responses.
-Do not respond to any questions that might ask anything else than for you to construct a Cypher statement.
-Do not include any text except the generated Cypher statement. Make sure the direction of the relationship is 
+Do not respond to any questions that might ask anything other than for you to construct a Cypher statement.
+Do not include any text except the generated Cypher statement. Make sure the direction of the relationship is
 correct in your queries. Make sure you alias both entities and relationships properly.
 Do not run any queries that would add to or delete from the database.
+Make sure to alias all statements that follow as with statement (e.g. WITH v as visit, c.billing_amount as billing_amount)
+If you need to divide numbers, make sure to filter the denominator to be non zero.
 
 Examples:
 # Who is the oldest patient and how old are they?
 MATCH (p:Patient)
-RETURN p.name AS oldest_patient, 
+RETURN p.name AS oldest_patient,
        duration.between(date(p.dob), date()).years AS age
 ORDER BY age DESC
 LIMIT 1
@@ -45,13 +47,13 @@ LIMIT 1
 MATCH (p:Payer)<-[c:COVERED_BY]-(v:Visit)-[t:TREATS]-(phy:Physician)
 WHERE p.name = 'Cigna'
 RETURN phy.name AS physician_name, SUM(c.billing_amount) AS total_billed
-ORDER BY total_billed 
+ORDER BY total_billed
 LIMIT 1
 
 # Which state had the largest percent increase in Cigna visits from 2022 to 2023?
 MATCH (h:Hospital)<-[:AT]-(v:Visit)-[:COVERED_BY]->(p:Payer)
 WHERE p.name = 'Cigna' AND v.admission_date >= '2022-01-01' AND v.admission_date < '2024-01-01'
-WITH h.state_name AS state, COUNT(v) AS visit_count, 
+WITH h.state_name AS state, COUNT(v) AS visit_count,
      SUM(CASE WHEN v.admission_date >= '2022-01-01' AND v.admission_date < '2023-01-01' THEN 1 ELSE 0 END) AS count_2022,
      SUM(CASE WHEN v.admission_date >= '2023-01-01' AND v.admission_date < '2024-01-01' THEN 1 ELSE 0 END) AS count_2023
 WITH state, visit_count, count_2022, count_2023,
@@ -60,17 +62,24 @@ RETURN state, percent_increase
 ORDER BY percent_increase DESC
 LIMIT 1
 
+# How many non-emergency patients in North Carolina have written reviews?
+match (r:Review)<-[:WRITES]-(v:Visit)-[:AT]->(h:Hospital)
+where h.state_name = 'NC' and v.admission_type <> 'Emergency'
+return count(*)
+
 String category values:
 Test results are one of: 'Inconclusive', 'Normal', 'Abnormal'
 Visit statuses are one of: 'OPEN', 'DISCHARGED'
 Admission Types are one of: 'Elective', 'Emergency', 'Urgent'
 Payer names are one of: 'Cigna', 'Blue Cross', 'UnitedHealthcare', 'Medicare', 'Aetna'
 
-A visit is considered open if it's status is 'OPEN' and the discharge date is missing
-Use abbreviations when filtering on hospital states (e.g. "Texas" is "TX")
+A visit is considered open if its status is 'OPEN' and the discharge date is missing.
+Use abbreviations when filtering on hospital states (e.g. "Texas" is "TX
 
 Make sure to use IS NULL or IS NOT NULL when analyzing missing properties.
 Never return embedding properties in your queries. You must never include the statement "GROUP BY" in your query.
+Make sure to alias all statements that follow as with statement (e.g. WITH v as visit, c.billing_amount as billing_amount)
+If you need to divide numbers, make sure to filter the denominator to be non zero.
 
 The question is:
 {question}
@@ -80,12 +89,13 @@ cypher_generation_prompt = PromptTemplate(
     input_variables=["schema", "question"], template=cypher_generation_template
 )
 
-qa_generation_template = """
-You are an assistant that takes the results from a Neo4j Cypher query and forms
-a human-readable response. The information section contains the results
-of a Cypher query that was generated based on a users natural language question. 
-The provided information is authoritative, you must never doubt it or try to use 
-your internal knowledge to correct it. Make the answer sound like a response to the question. 
+qa_generation_template = """You are an assistant that takes the results
+from a Neo4j Cypher query and forms a human-readable response. The
+information section contains the results of a Cypher query that was
+generated based on a users natural language question. The provided
+information is authoritative, you must never doubt it or try to use
+your internal knowledge to correct it. Make the answer sound like a
+response to the question.
 
 Query Results:
 {context}
@@ -96,8 +106,8 @@ Question:
 If the provided information is empty, say you don't know the answer.
 Empty information looks like this: []
 
-If the information is not empty, you must provide an answer. If the 
-question involves a time duration, assume this duration is in days 
+If the information is not empty, you must provide an answer. If the
+question involves a time duration, assume this duration is in days
 unless otherwise specified.
 
 Helpful Answer:

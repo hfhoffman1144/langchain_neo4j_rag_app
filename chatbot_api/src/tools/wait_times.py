@@ -3,13 +3,13 @@ from typing import Any
 import numpy as np
 from langchain.graphs import Neo4jGraph
 
-
 def get_current_wait_times(
     hospital: str, validate_hospital: bool = True
 ) -> str | float:
     """Get the current wait time at a hospital"""
 
     if validate_hospital:
+        
         graph = Neo4jGraph(
             url=os.getenv("NEO4J_URI"),
             username=os.getenv("NEO4J_USERNAME"),
@@ -19,7 +19,7 @@ def get_current_wait_times(
         current_hospitals = graph.query(
             """
             MATCH (h:Hospital)
-            RETURN h.name AS hospital_name 
+            RETURN h.name AS hospital_name
             """
         )
 
@@ -29,7 +29,6 @@ def get_current_wait_times(
             return f"Hospital '{hospital}' does not exist"
 
     return np.random.randint(low=0, high=600)
-
 
 def find_most_available_hospital(dummy_input: Any) -> dict[str, float]:
     """Find the hospital with the shortest wait time"""
@@ -43,7 +42,7 @@ def find_most_available_hospital(dummy_input: Any) -> dict[str, float]:
     current_hospitals = graph.query(
         """
         MATCH (h:Hospital)
-        RETURN h.name AS hospital_name 
+        RETURN h.name AS hospital_name
         """
     )
 

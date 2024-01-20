@@ -19,16 +19,18 @@ neo4j_vector_index = Neo4jVector.from_existing_graph(
     password=os.getenv("NEO4J_PASSWORD"),
     index_name="reviews",
     node_label="Review",
-    text_node_properties=["physician_name", "patient_name", "text", "hospital_name"],
+    text_node_properties=["physician_name",
+                          "patient_name",
+                          "text",
+                          "hospital_name"],
     embedding_node_property="embedding",
 )
 
-review_template = """ 
-Your job is to answer questions about hospital reviews from patients. Use
-the following context to answer questions. Be as detailed as possible, but 
+review_template = """Your job is to use patient
+reviews to answer questions about their experience at a hospital. Use
+the following context to answer questions. Be as detailed as possible, but
 don't make up any information that's not from the context. If you don't know
-an answer, say you don't know. 
-
+an answer, say you don't know.
 {context}
 """
 

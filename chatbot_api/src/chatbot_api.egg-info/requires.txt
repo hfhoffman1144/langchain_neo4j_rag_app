@@ -3,6 +3,7 @@ chromadb==0.4.17
 fastapi==0.109.0
 langchain==0.1.0
 langchain-openai==0.0.2
+langchainhub==0.1.14
 neo4j==5.14.1
 numpy==1.26.2
 openai==1.7.2

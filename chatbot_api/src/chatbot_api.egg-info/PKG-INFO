@@ -6,6 +6,7 @@ Requires-Dist: chromadb==0.4.17
 Requires-Dist: fastapi==0.109.0
 Requires-Dist: langchain==0.1.0
 Requires-Dist: langchain-openai==0.0.2
+Requires-Dist: langchainhub==0.1.14
 Requires-Dist: neo4j==5.14.1
 Requires-Dist: numpy==1.26.2
 Requires-Dist: openai==1.7.2
