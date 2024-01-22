@@ -29,45 +29,54 @@ LOGGER = logging.getLogger(__name__)
 
 @retry(tries=100, delay=10)
 def load_hospital_graph_from_csv() -> None:
-    """Load structured hospital CSV data following a specific ontology into Neo4j"""
+    """Load structured hospital CSV data following
+    a specific ontology into Neo4j"""
 
-    driver = GraphDatabase.driver(NEO4J_URI, auth=(NEO4J_USERNAME, NEO4J_PASSWORD))
+    driver = GraphDatabase.driver(
+        NEO4J_URI, auth=(NEO4J_USERNAME, NEO4J_PASSWORD)
+    )
 
     LOGGER.info("Setting uniqueness constraints on nodes")
     with driver.session(database="neo4j") as session:
         query = (
-            "CREATE CONSTRAINT IF NOT EXISTS FOR (h:Hospital) REQUIRE h.id IS UNIQUE;"
+            """CREATE CONSTRAINT IF NOT EXISTS FOR (h:Hospital)
+               REQUIRE h.id IS UNIQUE;"""
         )
         _ = session.run(query, {})
 
     with driver.session(database="neo4j") as session:
-        query = "CREATE CONSTRAINT IF NOT EXISTS FOR (p:Payer) REQUIRE p.id IS UNIQUE;"
+        query = """CREATE CONSTRAINT IF NOT EXISTS FOR (p:Payer)
+                   REQUIRE p.id IS UNIQUE;"""
         _ = session.run(query, {})
 
     with driver.session(database="neo4j") as session:
         query = (
-            "CREATE CONSTRAINT IF NOT EXISTS FOR (p:Physician) REQUIRE p.id IS UNIQUE;"
+            """CREATE CONSTRAINT IF NOT EXISTS FOR (p:Physician)
+               REQUIRE p.id IS UNIQUE;"""
         )
         _ = session.run(query, {})
 
     with driver.session(database="neo4j") as session:
         query = (
-            "CREATE CONSTRAINT IF NOT EXISTS FOR (p:Patient) REQUIRE p.id IS UNIQUE;"
+            """CREATE CONSTRAINT IF NOT EXISTS FOR (p:Patient)
+               REQUIRE p.id IS UNIQUE;"""
         )
         _ = session.run(query, {})
 
     with driver.session(database="neo4j") as session:
-        query = "CREATE CONSTRAINT IF NOT EXISTS FOR (v:Visit) REQUIRE v.id IS UNIQUE;"
+        query = """CREATE CONSTRAINT IF NOT EXISTS FOR (v:Visit)
+                   REQUIRE v.id IS UNIQUE;"""
         _ = session.run(query, {})
 
     with driver.session(database="neo4j") as session:
-        query = "CREATE CONSTRAINT IF NOT EXISTS FOR (r:Review) REQUIRE r.id IS UNIQUE;"
+        query = """CREATE CONSTRAINT IF NOT EXISTS FOR (r:Review)
+                   REQUIRE r.id IS UNIQUE;"""
         _ = session.run(query, {})
 
     LOGGER.info("Loading hospital nodes")
     with driver.session(database="neo4j") as session:
         query = f"""
-        LOAD CSV WITH HEADERS 
+        LOAD CSV WITH HEADERS
         FROM '{HOSPITALS_CSV_PATH}' AS hospitals
         MERGE (h:Hospital {{id: toInteger(hospitals.hospital_id),
                             name: hospitals.hospital_name,
@@ -80,14 +89,15 @@ def load_hospital_graph_from_csv() -> None:
         query = f"""
         LOAD CSV WITH HEADERS
         FROM '{PAYERS_CSV_PATH}' AS payers
-        MERGE (p:Payer {{id: toInteger(payers.payer_id), name: payers.payer_name}});
+        MERGE (p:Payer {{id: toInteger(payers.payer_id),
+        name: payers.payer_name}});
         """
         _ = session.run(query, {})
 
     LOGGER.info("Loading physician nodes")
     with driver.session(database="neo4j") as session:
         query = f"""
-        LOAD CSV WITH HEADERS 
+        LOAD CSV WITH HEADERS
         FROM '{PHYSICIANS_CSV_PATH}' AS physicians
         MERGE (p:Physician {{id: toInteger(physicians.physician_id),
                             name: physicians.physician_name,
@@ -112,7 +122,8 @@ def load_hospital_graph_from_csv() -> None:
         }})
             ON CREATE SET v.chief_complaint = visits.chief_complaint
             ON MATCH SET v.chief_complaint = visits.chief_complaint
-            ON CREATE SET v.treatment_description = visits.treatment_description
+            ON CREATE SET v.treatment_description =
+            visits.treatment_description
             ON MATCH SET v.treatment_description = visits.treatment_description
             ON CREATE SET v.diagnosis = visits.primary_diagnosis
             ON MATCH SET v.diagnosis = visits.primary_diagnosis
@@ -124,7 +135,7 @@ def load_hospital_graph_from_csv() -> None:
     LOGGER.info("Loading patient nodes")
     with driver.session(database="neo4j") as session:
         query = f"""
-        LOAD CSV WITH HEADERS 
+        LOAD CSV WITH HEADERS
         FROM '{PATIENTS_CSV_PATH}' AS patients
         MERGE (p:Patient {{id: toInteger(patients.patient_id),
                         name: patients.patient_name,
@@ -138,7 +149,7 @@ def load_hospital_graph_from_csv() -> None:
     LOGGER.info("Loading review nodes")
     with driver.session(database="neo4j") as session:
         query = f"""
-        LOAD CSV WITH HEADERS 
+        LOAD CSV WITH HEADERS
         FROM '{REVIEWS_CSV_PATH}' AS reviews
         MERGE (r:Review {{id: toInteger(reviews.review_id),
                          text: reviews.review,
@@ -151,10 +162,11 @@ def load_hospital_graph_from_csv() -> None:
 
     LOGGER.info("Loading 'AT' relationships")
     with driver.session(database="neo4j") as session:
-        query = f"""  
+        query = f"""
         LOAD CSV WITH HEADERS FROM '{VISITS_CSV_PATH}' AS row
         MATCH (source: `Visit` {{ `id`: toInteger(trim(row.`visit_id`)) }})
-        MATCH (target: `Hospital` {{ `id`: toInteger(trim(row.`hospital_id`)) }})
+        MATCH (target: `Hospital` {{ `id`:
+        toInteger(trim(row.`hospital_id`))}})
         MERGE (source)-[r: `AT`]->(target)
         """
         _ = session.run(query, {})
@@ -186,7 +198,7 @@ def load_hospital_graph_from_csv() -> None:
             MATCH (v:Visit {{id: toInteger(visits.visit_id)}})
             MATCH (p:Payer {{id: toInteger(visits.payer_id)}})
             MERGE (v)-[covered_by:COVERED_BY]->(p)
-            ON CREATE SET 
+            ON CREATE SET
                 covered_by.service_date = visits.discharge_date,
                 covered_by.billing_amount = toFloat(visits.billing_amount)
         """

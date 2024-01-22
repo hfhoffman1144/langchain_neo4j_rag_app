@@ -35,7 +35,8 @@ an answer, say you don't know.
 """
 
 review_system_prompt = SystemMessagePromptTemplate(
-    prompt=PromptTemplate(input_variables=["context"], template=review_template)
+    prompt=PromptTemplate(
+        input_variables=["context"], template=review_template)
 )
 
 review_human_prompt = HumanMessagePromptTemplate(

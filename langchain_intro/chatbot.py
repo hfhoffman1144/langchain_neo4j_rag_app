@@ -28,7 +28,8 @@ an answer, say you don't know.
 """
 
 review_system_prompt = SystemMessagePromptTemplate(
-    prompt=PromptTemplate(input_variables=["context"], template=review_template_str)
+    prompt=PromptTemplate(input_variables=["context"],
+                          template=review_template_str)
 )
 
 review_human_prompt = HumanMessagePromptTemplate(
@@ -45,7 +46,8 @@ chat_model = ChatOpenAI(model="gpt-3.5-turbo", temperature=0)
 output_parser = StrOutputParser()
 
 reviews_vector_db = Chroma(
-    persist_directory=REVIEWS_CHROMA_PATH, embedding_function=OpenAIEmbeddings()
+    persist_directory=REVIEWS_CHROMA_PATH,
+    embedding_function=OpenAIEmbeddings()
 )
 
 reviews_retriver = reviews_vector_db.as_retriever(k=10)
@@ -98,7 +100,9 @@ hospital_agent = create_openai_functions_agent(
     tools=tools,
 )
 
-hospital_agent_executor = AgentExecutor(agent=hospital_agent,
-                                            tools=tools,
-                                            return_intermediate_steps=True,
-                                            verbose=True,)
+hospital_agent_executor = AgentExecutor(
+    agent=hospital_agent,
+    tools=tools,
+    return_intermediate_steps=True,
+    verbose=True,
+)
