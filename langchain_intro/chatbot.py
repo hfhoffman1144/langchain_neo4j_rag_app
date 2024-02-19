@@ -12,9 +12,9 @@ from langchain_openai import OpenAIEmbeddings
 from langchain.schema.runnable import RunnablePassthrough
 from langchain.agents import create_openai_functions_agent, Tool, AgentExecutor
 from langchain import hub
-from tools import get_current_wait_time
+from langchain_intro.tools import get_current_wait_time
 
-REVIEWS_CHROMA_PATH = "../chroma_data"
+REVIEWS_CHROMA_PATH = "chroma_data/"
 
 
 dotenv.load_dotenv()
@@ -28,8 +28,9 @@ an answer, say you don't know.
 """
 
 review_system_prompt = SystemMessagePromptTemplate(
-    prompt=PromptTemplate(input_variables=["context"],
-                          template=review_template_str)
+    prompt=PromptTemplate(
+        input_variables=["context"], template=review_template_str
+    )
 )
 
 review_human_prompt = HumanMessagePromptTemplate(
@@ -41,19 +42,19 @@ review_prompt_template = ChatPromptTemplate(
     input_variables=["context", "question"], messages=messages
 )
 
-chat_model = ChatOpenAI(model="gpt-3.5-turbo", temperature=0)
+chat_model = ChatOpenAI(model="gpt-3.5-turbo-0125", temperature=0)
 
 output_parser = StrOutputParser()
 
 reviews_vector_db = Chroma(
     persist_directory=REVIEWS_CHROMA_PATH,
-    embedding_function=OpenAIEmbeddings()
+    embedding_function=OpenAIEmbeddings(),
 )
 
-reviews_retriver = reviews_vector_db.as_retriever(k=10)
+reviews_retriever = reviews_vector_db.as_retriever(k=10)
 
 review_chain = (
-    {"context": reviews_retriver, "question": RunnablePassthrough()}
+    {"context": reviews_retriever, "question": RunnablePassthrough()}
     | review_prompt_template
     | chat_model
     | StrOutputParser()

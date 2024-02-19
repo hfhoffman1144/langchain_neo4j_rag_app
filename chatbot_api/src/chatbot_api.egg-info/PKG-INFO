@@ -1,0 +1,17 @@
+Metadata-Version: 2.1
+Name: chatbot_api
+Version: 0.1
+Requires-Dist: asyncio==3.4.3
+Requires-Dist: fastapi==0.109.0
+Requires-Dist: langchain==0.1.0
+Requires-Dist: langchain-openai==0.0.2
+Requires-Dist: langchainhub==0.1.14
+Requires-Dist: neo4j==5.14.1
+Requires-Dist: numpy==1.26.2
+Requires-Dist: openai==1.7.2
+Requires-Dist: opentelemetry-api==1.22.0
+Requires-Dist: pydantic==2.5.1
+Requires-Dist: uvicorn==0.25.0
+Provides-Extra: dev
+Requires-Dist: black; extra == "dev"
+Requires-Dist: flake8; extra == "dev"

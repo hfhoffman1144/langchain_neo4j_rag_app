@@ -134,8 +134,7 @@ a way that isn't ambiguous and allows someone to tell what the full
 names are.
 
 Never say you don't have the right information if there is data in
-the query results. Make sure to show all the relevant query results
-if you're asked.
+the query results. Always use the data in the query results.
 
 Helpful Answer:
 """
