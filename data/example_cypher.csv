@@ -1,4 +1,4 @@
-questions,cypher
+question,cypher
 Who is the oldest patient and how old are they?,"
     MATCH (p:Payer)<-[c:COVERED_BY]-(v:Visit)-[t:TREATS]-(phy:Physician)
     WHERE p.name = 'Cigna'
