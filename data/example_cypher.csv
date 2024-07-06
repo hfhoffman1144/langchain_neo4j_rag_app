@@ -1,0 +1,20 @@
+questions,cypher
+Who is the oldest patient and how old are they?,"
+    MATCH (p:Payer)<-[c:COVERED_BY]-(v:Visit)-[t:TREATS]-(phy:Physician)
+    WHERE p.name = 'Cigna'
+    RETURN phy.name AS physician_name, SUM(c.billing_amount) AS total_billed
+    ORDER BY total_billed
+    LIMIT 1
+    "
+Which physician has billed the least to Cigna,"
+    MATCH (p:Payer)<-[c:COVERED_BY]-(v:Visit)-[t:TREATS]-(phy:Physician)
+    WHERE p.name = 'Cigna'
+    RETURN phy.name AS physician_name, SUM(c.billing_amount) AS total_billed
+    ORDER BY total_billed
+    LIMIT 1
+    "
+How many non-emergency patients in North Carolina have written reviews?,"
+    match (r:Review)<-[:WRITES]-(v:Visit)-[:AT]->(h:Hospital)
+    where h.state_name = 'NC' and v.admission_type <> 'Emergency'
+    return count(*)
+    "
