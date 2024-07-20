@@ -1,0 +1,50 @@
+name: Run Tests
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    environment: dev
+
+    steps:
+    - name: Check out code
+      uses: actions/checkout@v2
+
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.12'
+
+    - name: Install Poetry
+      run: |
+        curl -sSL https://install.python-poetry.org | python3 -
+
+    - name: Configure Poetry
+      run: |
+        poetry config virtualenvs.create false
+
+    - name: Install dependencies
+      run: |
+        poetry install
+
+    - name: Set PYTHONPATH
+      run: echo "PYTHONPATH=${{ github.workspace }}" >> $GITHUB_ENV
+
+    - name: Run tests
+      env:
+        OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+        NEO4J_URI: ${{ secrets.NEO4J_URI }}
+        NEO4J_USERNAME: ${{ secrets.NEO4J_USERNAME }}
+        NEO4J_PASSWORD: ${{ secrets.NEO4J_PASSWORD }}
+        NEO4J_CYPHER_EXAMPLES_INDEX_NAME: ${{ secrets.NEO4J_CYPHER_EXAMPLES_INDEX_NAME }}
+        NEO4J_CYPHER_EXAMPLES_TEXT_NODE_PROPERTY: ${{ secrets.NEO4J_CYPHER_EXAMPLES_TEXT_NODE_PROPERTY }}
+        NEO4J_CYPHER_EXAMPLES_NODE_NAME: ${{ secrets.NEO4J_CYPHER_EXAMPLES_NODE_NAME }}
+        NEO4J_CYPHER_EXAMPLES_METADATA_NAME: ${{ secrets.NEO4J_CYPHER_EXAMPLES_METADATA_NAME }}
+
+      run: |
+        poetry run pytest cypher_example_portal/tests/
