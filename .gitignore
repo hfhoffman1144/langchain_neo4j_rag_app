@@ -1,3 +1,4 @@
 chroma_data/
 *.env
 notebooks/
+eda/
