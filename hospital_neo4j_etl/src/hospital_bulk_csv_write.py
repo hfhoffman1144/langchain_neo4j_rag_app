@@ -27,7 +27,7 @@ logging.basicConfig(
 
 LOGGER = logging.getLogger(__name__)
 
-NODES = ["Hospital", "Payer", "Physician", "Patient", "Visit", "Review", "Questions"]
+NODES = ["Hospital", "Payer", "Physician", "Patient", "Visit", "Review", "Question"]
 
 
 def _set_uniqueness_constraints(tx, node):

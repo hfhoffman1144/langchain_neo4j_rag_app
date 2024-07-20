@@ -8,6 +8,11 @@ readme = "README.md"
 [tool.poetry.dependencies]
 python = "^3.12"
 pre-commit = "^3.7.1"
+langchain-community = "^0.2.9"
+langchain-openai = "^0.1.17"
+streamlit = "^1.36.0"
+pytest = "^8.3.1"
+neo4j = "^5.22.0"
 
 
 [build-system]

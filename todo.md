@@ -1,6 +1,8 @@
 - Dynamic few-shot prompting
+- Incorrect examples
 - Dev ops
     - Unit tests
+        - Cypher queries run successfully
     - Pre-commit
     - Github workflows
 - Memory (with redis)
