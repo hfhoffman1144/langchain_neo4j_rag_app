@@ -1,19 +1,45 @@
 import os
 from langchain_community.graphs import Neo4jGraph
-from langchain.chains import GraphCypherQAChain
 from langchain_openai import ChatOpenAI
 from langchain.prompts import PromptTemplate
+from langchain_community.vectorstores.neo4j_vector import Neo4jVector
+from langchain_openai import OpenAIEmbeddings
+from langchain_custom.graph_qa.cypher import GraphCypherQAChain
+
+NEO4J_URI = os.getenv("NEO4J_URI")
+NEO4J_USERNAME = os.getenv("NEO4J_USERNAME")
+NEO4J_PASSWORD = os.getenv("NEO4J_PASSWORD")
 
 HOSPITAL_QA_MODEL = os.getenv("HOSPITAL_QA_MODEL")
 HOSPITAL_CYPHER_MODEL = os.getenv("HOSPITAL_CYPHER_MODEL")
+NEO4J_URI = os.getenv("NEO4J_URI")
+NEO4J_USERNAME = os.getenv("NEO4J_USERNAME")
+NEO4J_PASSWORD = os.getenv("NEO4J_Password")
+NEO4J_CYPHER_EXAMPLES_INDEX_NAME = os.getenv("NEO4J_CYPHER_EXAMPLES_INDEX_NAME")
+NEO4J_CYPHER_EXAMPLES_TEXT_NODE_PROPERTY = os.getenv(
+    "NEO4J_CYPHER_EXAMPLES_TEXT_NODE_PROPERTY"
+)
+NEO4J_CYPHER_EXAMPLES_NODE_NAME = os.getenv("NEO4J_CYPHER_EXAMPLES_NODE_NAME")
+NEO4J_CYPHER_EXAMPLES_METADATA_NAME = os.getenv("NEO4J_CYPHER_EXAMPLES_METADATA_NAME")
 
 graph = Neo4jGraph(
-    url=os.getenv("NEO4J_URI"),
-    username=os.getenv("NEO4J_USERNAME"),
-    password=os.getenv("NEO4J_PASSWORD"),
+    url=NEO4J_URI,
+    username=NEO4J_USERNAME,
+    password=NEO4J_PASSWORD,
 )
 
 graph.refresh_schema()
+
+cypher_example_index = Neo4jVector.from_existing_index(
+    embedding=OpenAIEmbeddings(),
+    url=NEO4J_URI,
+    username=NEO4J_USERNAME,
+    password=NEO4J_PASSWORD,
+    index_name=NEO4J_CYPHER_EXAMPLES_INDEX_NAME,
+    text_node_property=NEO4J_CYPHER_EXAMPLES_TEXT_NODE_PROPERTY,
+)
+
+cypher_example_retriever = cypher_example_index.as_retriever(search_kwargs={"k": 4})
 
 cypher_generation_template = """
 Task:
@@ -38,42 +64,8 @@ statement (e.g. WITH v as visit, c.billing_amount as billing_amount)
 If you need to divide numbers, make sure to
 filter the denominator to be non zero.
 
-Examples:
-# Who is the oldest patient and how old are they?
-MATCH (p:Patient)
-RETURN p.name AS oldest_patient,
-       duration.between(date(p.dob), date()).years AS age
-ORDER BY age DESC
-LIMIT 1
-
-# Which physician has billed the least to Cigna
-MATCH (p:Payer)<-[c:COVERED_BY]-(v:Visit)-[t:TREATS]-(phy:Physician)
-WHERE p.name = 'Cigna'
-RETURN phy.name AS physician_name, SUM(c.billing_amount) AS total_billed
-ORDER BY total_billed
-LIMIT 1
-
-# Which state had the largest percent increase in Cigna visits
-# from 2022 to 2023?
-MATCH (h:Hospital)<-[:AT]-(v:Visit)-[:COVERED_BY]->(p:Payer)
-WHERE p.name = 'Cigna' AND v.admission_date >= '2022-01-01' AND
-v.admission_date < '2024-01-01'
-WITH h.state_name AS state, COUNT(v) AS visit_count,
-     SUM(CASE WHEN v.admission_date >= '2022-01-01' AND
-     v.admission_date < '2023-01-01' THEN 1 ELSE 0 END) AS count_2022,
-     SUM(CASE WHEN v.admission_date >= '2023-01-01' AND
-     v.admission_date < '2024-01-01' THEN 1 ELSE 0 END) AS count_2023
-WITH state, visit_count, count_2022, count_2023,
-     (toFloat(count_2023) - toFloat(count_2022)) / toFloat(count_2022) * 100
-     AS percent_increase
-RETURN state, percent_increase
-ORDER BY percent_increase DESC
-LIMIT 1
-
-# How many non-emergency patients in North Carolina have written reviews?
-match (r:Review)<-[:WRITES]-(v:Visit)-[:AT]->(h:Hospital)
-where h.state_name = 'NC' and v.admission_type <> 'Emergency'
-return count(*)
+Example queries for this schema:
+{example_queries}
 
 String category values:
 Test results are one of: 'Inconclusive', 'Normal', 'Abnormal'
@@ -84,10 +76,6 @@ Payer names are one of: 'Cigna', 'Blue Cross', 'UnitedHealthcare', 'Medicare',
 
 A visit is considered open if its status is 'OPEN' and the discharge date is
 missing.
-Use abbreviations when
-filtering on hospital states (e.g. "Texas" is "TX",
-"Colorado" is "CO", "North Carolina" is "NC",
-"Florida" is "FL", "Georgia" is "GA, etc.)
 
 Make sure to use IS NULL or IS NOT NULL when analyzing missing properties.
 Never return embedding properties in your queries. You must never include the
@@ -97,12 +85,16 @@ billing_amount)
 If you need to divide numbers, make sure to filter the denominator to be non
 zero.
 
+Use state abbreviations instead of their full name. For example, you should
+change "Texas" to "TX", "Colorado" to "CO", "North Carolina" to "NC", and so on.
+
 The question is:
 {question}
 """
 
 cypher_generation_prompt = PromptTemplate(
-    input_variables=["schema", "question"], template=cypher_generation_template
+    input_variables=["schema", "example_queries", "question"],
+    template=cypher_generation_template,
 )
 
 qa_generation_template = """You are an assistant that takes the results
@@ -147,6 +139,7 @@ qa_generation_prompt = PromptTemplate(
 hospital_cypher_chain = GraphCypherQAChain.from_llm(
     cypher_llm=ChatOpenAI(model=HOSPITAL_CYPHER_MODEL, temperature=0),
     qa_llm=ChatOpenAI(model=HOSPITAL_QA_MODEL, temperature=0),
+    cypher_example_retriever=cypher_example_retriever,
     graph=graph,
     verbose=True,
     qa_prompt=qa_generation_prompt,

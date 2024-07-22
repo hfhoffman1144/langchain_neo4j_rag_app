@@ -26,3 +26,13 @@ services:
       - chatbot_api
     ports:
       - "8501:8501"
+
+  cypher_example_portal:
+    build:
+      context: ./cypher_example_portal
+    env_file:
+      - .env
+    depends_on:
+      - hospital_neo4j_etl
+    ports:
+      - "8502:8502"

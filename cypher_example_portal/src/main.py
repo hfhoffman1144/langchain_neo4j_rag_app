@@ -9,13 +9,19 @@ from graph_utils import (
 st.title("Cypher Example Self-Service Portal")
 
 with st.sidebar:
-    st.title("About")
-    st.info(
+    st.header("About")
+    st.markdown(
         """
-    Add example questions and corresponding Cypher queries to be used
-    as context for the Hospital System Chatbot. Your query must execute
-    successfully in the existing database, and ideally be reviewed by
-    others, to make it into the database.
+    This app allows you to add example questions and their corresponding
+    Cypher queries to a vector index used by the
+    [Hospital System Chatbot](https://github.com/hfhoffman1144/langchain_neo4j_rag_app).
+
+    When you ask the chatbot to generate Cypher queries, it dynamically retrieves
+    semantically similar questions and their corresponding Cypher queries from the
+    vector index. This context helps the chatbot generate more accurate queries.
+
+    If the chatbot generates an incorrect query for a question, and
+    you know the correct query, add it here!
     """
     )
 
@@ -44,13 +50,17 @@ if st.session_state.validated:
 
     similar_question = fetch_most_similar_question(question)
 
-    st.warning(
-        f"""
-        The most similar question to this one currently in the
-        example index is "{similar_question}" Are you sure you
-        want to proceed?
-        """
-    )
+    if similar_question is None:
+        st.success("There are currently no example questions in the example index.")
+
+    else:
+        st.warning(
+            f"""
+            The most similar question to this one currently in the
+            example index is "{similar_question}" Are you sure you
+            want to proceed?
+            """
+        )
 
     if st.button("Upload"):
         results = add_example_cypher_query(question, cypher)

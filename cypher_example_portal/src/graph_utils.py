@@ -74,13 +74,17 @@ def is_valid_cypher_query(query: str) -> bool:
         return False
 
 
-def fetch_most_similar_question(question: str) -> str:
+def fetch_most_similar_question(question: str) -> str | None:
     """
     Perform semantic search to find the most similar question to
     the input.
     """
 
     documents = NEO4J_VECTOR_INDEX.similarity_search(question)
+
+    if len(documents) == 0:
+        return None
+
     return documents[0].page_content
 
 

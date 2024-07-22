@@ -1,4 +1,11 @@
 - Dynamic few-shot prompting
+   - [X] Figure out how to open cypher example self-service portal
+   - [X] Update README
+    - Test adding and removing examples
+    - Add more unit tests
+    - Clean repo
+    - Write article
+- Create example question gallery on GitHub
 - Incorrect examples
 - Dev ops
     - Unit tests
@@ -8,3 +15,4 @@
 - Memory (with redis)
 - Email tool
 - Dynamic foundation models (including open-source)
+- Generating visualizations

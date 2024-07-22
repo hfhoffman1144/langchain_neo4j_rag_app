@@ -53,7 +53,7 @@ def get_current_wait_times(hospital: str) -> str:
     return formatted_wait_time
 
 
-def get_most_available_hospital(_: Any) -> dict[str, float]:
+def get_most_available_hospital(tmp: Any) -> dict[str, float]:
     """Find the hospital with the shortest wait time."""
 
     current_hospitals = _get_current_hospitals()
