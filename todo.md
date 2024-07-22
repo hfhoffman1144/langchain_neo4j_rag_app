@@ -16,3 +16,12 @@
 - Email tool
 - Dynamic foundation models (including open-source)
 - Generating visualizations
+- Streaming
+
+
+
+
+- What is the average duration in days for closed emergency visits?
+- What was the total billing amount charged to each payer for 2023?
+- What is the average billing amount for medicaid visits?
+- What is the average billing amount per day for Aetna patients?

@@ -1,9 +1,9 @@
 question,cypher
 Who is the oldest patient and how old are they?,"
-    MATCH (p:Payer)<-[c:COVERED_BY]-(v:Visit)-[t:TREATS]-(phy:Physician)
-    WHERE p.name = 'Cigna'
-    RETURN phy.name AS physician_name, SUM(c.billing_amount) AS total_billed
-    ORDER BY total_billed
+    MATCH (p:Patient)
+    RETURN p.name AS oldest_patient,
+        duration.between(date(p.dob), date()).years AS age
+    ORDER BY age DESC
     LIMIT 1
     "
 Which physician has billed the least to Cigna,"
