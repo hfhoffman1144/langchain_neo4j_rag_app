@@ -74,6 +74,9 @@ Admission Types are one of: 'Elective', 'Emergency', 'Urgent'
 Payer names are one of: 'Cigna', 'Blue Cross', 'UnitedHealthcare', 'Medicare',
 'Aetna'
 
+If you're filtering on a string, make sure to lowercase the property and filter
+value.
+
 A visit is considered open if its status is 'OPEN' and the discharge date is
 missing.
 

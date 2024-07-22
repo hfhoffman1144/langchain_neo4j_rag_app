@@ -17,6 +17,7 @@
 - Dynamic foundation models (including open-source)
 - Generating visualizations
 - Streaming
+- Query corrector
 
 
 
