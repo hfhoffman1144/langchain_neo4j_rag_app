@@ -95,7 +95,8 @@ if prompt := st.chat_input("What do you want to know?"):
 
         else:
             output_text = """An error occurred while processing your message.
-            Please try again or rephrase your message."""
+            This usually means the chatbot failed at generating a query to
+            answer your question. Please try again or rephrase your message."""
             explanation = output_text
 
     st.chat_message("assistant").markdown(output_text)

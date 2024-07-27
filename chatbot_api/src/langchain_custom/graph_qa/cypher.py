@@ -38,7 +38,7 @@ from langchain_community.chains.graph_qa.prompts import (
 from langchain_community.graphs.graph_store import GraphStore
 from langchain_core.vectorstores import VectorStoreRetriever
 from operator import itemgetter
-from langchain_custom.graph_qa.custom_prompts import (
+from src.langchain_custom.graph_qa.custom_prompts import (
     CYPHER_GENERATION_WITH_EXAMPLES_PROMPT,
 )
 
@@ -173,6 +173,23 @@ def format_retrieved_documents(documents: list[Document]) -> str:
     return result
 
 
+def remove_keys_from_dicts(input_list: list, keys_to_remove: list):
+    """Remove keys from a nested dictionary"""
+
+    def remove_keys_from_dict(d, keys):
+        if isinstance(d, dict):
+            d = {
+                k: (remove_keys_from_dict(v, keys) if isinstance(v, dict) else v)
+                for k, v in d.items()
+                if k not in keys
+            }
+        elif isinstance(d, list):
+            d = [remove_keys_from_dict(i, keys) for i in d]
+        return d
+
+    return [remove_keys_from_dict(item, keys_to_remove) for item in input_list]
+
+
 class GraphCypherQAChain(Chain):
     """Chain for question-answering against a graph by generating Cypher statements.
 
@@ -206,6 +223,8 @@ class GraphCypherQAChain(Chain):
     """Whether to wrap the database context as tool/function response"""
     cypher_example_retriever: Optional[VectorStoreRetriever] = None
     """Optional retriever to augment the prompt with example Cypher queries"""
+    node_properties_to_exclude: Optional[list[str]] = None
+    """Optional list of node properties to exclude from context in the QA prompt"""
 
     @property
     def input_keys(self) -> List[str]:
@@ -245,6 +264,7 @@ class GraphCypherQAChain(Chain):
         cypher_llm_kwargs: Optional[Dict[str, Any]] = None,
         use_function_response: bool = False,
         function_response_system: str = FUNCTION_RESPONSE_SYSTEM,
+        node_properties_to_exclude: Optional[list[str]] = None,
         **kwargs: Any,
     ) -> GraphCypherQAChain:
         """Initialize from LLM."""
@@ -348,6 +368,7 @@ class GraphCypherQAChain(Chain):
             cypher_query_corrector=cypher_query_corrector,
             use_function_response=use_function_response,
             cypher_example_retriever=cypher_example_retriever,
+            node_properties_to_exclude=node_properties_to_exclude,
             **kwargs,
         )
 
@@ -392,6 +413,12 @@ class GraphCypherQAChain(Chain):
         # Generated Cypher be null if query corrector identifies invalid schema
         if generated_cypher:
             context = self.graph.query(generated_cypher)[: self.top_k]
+
+            if self.node_properties_to_exclude and isinstance(context, list):
+                context = remove_keys_from_dicts(
+                    context, self.node_properties_to_exclude
+                )
+
         else:
             context = []
 

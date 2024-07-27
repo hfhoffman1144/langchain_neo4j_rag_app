@@ -17,6 +17,7 @@ Do not include any text except the generated Cypher statement.
 
 The question is:
 {question}"""
+
 CYPHER_GENERATION_WITH_EXAMPLES_PROMPT = PromptTemplate(
     input_variables=["schema", "example_queries", "question"],
     template=CYPHER_GENERATION_WITH_EXAMPLES_TEMPLATE,

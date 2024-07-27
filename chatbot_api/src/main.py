@@ -1,7 +1,7 @@
 from fastapi import FastAPI
-from agents.hospital_rag_agent import hospital_rag_agent_executor
-from models.hospital_rag_query import HospitalQueryInput, HospitalQueryOutput
-from utils.async_utils import async_retry
+from src.agents.hospital_rag_agent import hospital_rag_agent_executor
+from src.models.hospital_rag_query import HospitalQueryInput, HospitalQueryOutput
+from src.utils.async_utils import async_retry
 
 app = FastAPI(
     title="Hospital Chatbot",

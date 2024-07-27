@@ -22,13 +22,18 @@ NEO4J_GRAPH = Neo4jGraph(
 
 NEO4J_GRAPH.refresh_schema()
 
-NEO4J_VECTOR_INDEX = Neo4jVector.from_existing_index(
+NEO4J_VECTOR_INDEX = Neo4jVector.from_existing_graph(
     embedding=OpenAIEmbeddings(),
     url=NEO4J_URI,
     username=NEO4J_USERNAME,
     password=NEO4J_PASSWORD,
     index_name=NEO4J_CYPHER_EXAMPLES_INDEX_NAME,
+    node_label=NEO4J_CYPHER_EXAMPLES_TEXT_NODE_PROPERTY.capitalize(),
+    text_node_properties=[
+        NEO4J_CYPHER_EXAMPLES_TEXT_NODE_PROPERTY,
+    ],
     text_node_property=NEO4J_CYPHER_EXAMPLES_TEXT_NODE_PROPERTY,
+    embedding_node_property="embedding",
 )
 
 

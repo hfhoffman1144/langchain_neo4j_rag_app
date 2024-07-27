@@ -48,3 +48,4 @@ jobs:
 
       run: |
         poetry run pytest cypher_example_portal/tests/
+        poetry run pytest chatbot_api/tests/

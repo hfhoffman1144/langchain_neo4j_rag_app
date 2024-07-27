@@ -2079,6 +2079,17 @@ files = [
 ]
 
 [[package]]
+name = "rptree"
+version = "0.1.1"
+description = "Generate directory tree diagrams for Real Python articles"
+optional = false
+python-versions = "*"
+files = [
+    {file = "rptree-0.1.1-py3-none-any.whl", hash = "sha256:1d82b6021da24b5f9b2962dfb6dce357c271805c71041011433e90af35e3806a"},
+    {file = "rptree-0.1.1.tar.gz", hash = "sha256:f475b7287d26de904af2bca6332d3290436acd53e5b4e00271fe91af16e56981"},
+]
+
+[[package]]
 name = "six"
 version = "1.16.0"
 description = "Python 2 and 3 compatibility utilities"
@@ -2586,4 +2597,4 @@ multidict = ">=4.0"
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.12"
-content-hash = "2570f03f45d627eb34e80af579bfdc80ec672534e6d6798c46b9e74599537548"
+content-hash = "0d08d0b3bed7df4c7ed8f7d8e9da98f06fbeb7610a3d2e1bee7563840824cb80"
