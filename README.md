@@ -69,6 +69,7 @@ The plan for this project is to iteratively improve the Hospital System Chatbot 
 
 - **Memory with Redis**
 - **Hybrid structured and unstructured RAG**
+- **Multi-modal RAG**
 - **An email tool**
 - **Data visualizations**
 - **Stateful agents with LangGraph**
