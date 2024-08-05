@@ -34,3 +34,25 @@ Which state had the largest percent increase in Cigna visits from 2022 to 2023?,
     ORDER BY percent_increase DESC
     LIMIT 1
     "
+what is the average duration in days for closed elective visits?,"
+    MATCH (v:Visit)
+    WHERE lower(v.status) = 'discharged' AND lower(v.admission_type) = 'elective'
+    RETURN AVG(duration.inDays(date(v.admission_date), date(v.discharge_date)).days) AS average_duration_days
+    "
+what was the total billing amount charged by each hospital for 2023?,"
+    MATCH (p:Payer)<-[c:COVERED_BY]-(v:Visit)-[a:AT]-(h:Hospital)
+    WHERE v.admission_date >= '2023-01-01' AND v.admission_date < '2024-01-01'
+    RETURN h.name AS hospital_name, SUM(c.billing_amount) AS total_billing_amount
+    "
+"for visits that are missing chief complaints, what percentage have reviews?","
+    MATCH (v:Visit)
+    WHERE v.chief_complaint IS NULL
+    WITH COUNT(v) AS total_visits
+    MATCH (v)-[:WRITES]->(r:Review)
+    WITH total_visits, COUNT(r) AS visits_with_reviews
+    RETURN (toFloat(visits_with_reviews) / total_visits) * 100 AS percentage_with_reviews
+    "
+how much was billed for patient 123's stay?,"
+    MATCH (p:Patient {id: 123})-[:HAS]->(v:Visit)-[c:COVERED_BY]->(:Payer)
+RETURN SUM(c.billing_amount) AS total_billed
+    "
