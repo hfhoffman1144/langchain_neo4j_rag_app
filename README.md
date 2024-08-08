@@ -63,6 +63,13 @@ After each container finishes building, you'll be able to access the chatbot api
 
 ![Demo](./langchain_rag_chatbot_demo.gif)
 
+## Supporting Articles
+
+You can read the following articles for more detailed information on this project:
+
+- [Build an LLM RAG Chatbot With LangChain](https://realpython.com/build-llm-rag-chatbot-with-langchain/#demo-a-llm-rag-chatbot-with-langchain-and-neo4j)
+- [A Simple Strategy to Improve LLM Query Generation](https://towardsdatascience.com/a-simple-strategy-to-improve-llm-query-generation-3178a7426c6f)
+
 ## Future Additions
 
 The plan for this project is to iteratively improve the Hospital System Chatbot over time as new libraries, techniques, and models emerge in the RAG and Generative AI space. Here are a few features currently in the backlog:
