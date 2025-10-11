@@ -9,6 +9,9 @@ from langchain.prompts import (
     HumanMessagePromptTemplate,
     ChatPromptTemplate,
 )
+from src.utils.docx_ingest import simple_search
+from langchain.chains import LLMChain
+from langchain.schema import Document
 
 HOSPITAL_QA_MODEL = os.getenv("HOSPITAL_QA_MODEL")
 
@@ -55,3 +58,26 @@ reviews_vector_chain = RetrievalQA.from_chain_type(
     retriever=neo4j_vector_index.as_retriever(k=12),
 )
 reviews_vector_chain.combine_documents_chain.llm_chain.prompt = review_prompt
+
+
+def uploaded_docs_retriever(question: str) -> str:
+    """Search uploaded docs (DOCX) stored locally and return a context string."""
+    results = simple_search(question, k=6)
+    if not results:
+        return ""
+
+    # Combine top results into one context
+    docs = [Document(page_content=r["text"]) for r in results]
+    combined = "\n\n---\n\n".join([d.page_content for d in docs])
+    return combined
+
+
+def uploaded_reviews_chain(question: str) -> str:
+    """LLM answer over uploaded docs only."""
+    context = uploaded_docs_retriever(question)
+    if not context:
+        return "No uploaded documents found matching the query."
+
+    llm = ChatOpenAI(model=HOSPITAL_QA_MODEL, temperature=0)
+    chain = LLMChain(llm=llm, prompt=review_prompt)
+    return chain.run({"context": context, "question": question})

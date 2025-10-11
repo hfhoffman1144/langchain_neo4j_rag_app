@@ -7,7 +7,10 @@ from langchain.agents.format_scratchpad.openai_tools import (
     format_to_openai_tool_messages,
 )
 from langchain.agents.output_parsers.openai_tools import OpenAIToolsAgentOutputParser
-from src.chains.hospital_review_chain import reviews_vector_chain
+from src.chains.hospital_review_chain import (
+    reviews_vector_chain,
+    uploaded_reviews_chain,
+)
 from src.chains.hospital_cypher_chain import hospital_cypher_chain
 from src.tools.wait_times import (
     get_current_wait_times,
@@ -37,6 +40,13 @@ def explore_patient_experiences(question: str) -> str:
     """
 
     return reviews_vector_chain.invoke(question)
+
+
+@tool
+def explore_uploaded_documents(question: str) -> str:
+    """Search and answer over user-uploaded DOCX files."""
+
+    return uploaded_reviews_chain(question)
 
 
 @tool
@@ -82,6 +92,7 @@ def find_most_available_hospital(tmp: Any) -> dict[str, float]:
 
 agent_tools = [
     explore_patient_experiences,
+    explore_uploaded_documents,
     explore_hospital_database,
     get_hospital_wait_time,
     find_most_available_hospital,
