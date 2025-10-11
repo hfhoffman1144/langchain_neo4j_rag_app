@@ -1,10 +1,10 @@
 ## Repository purpose (short)
 
 This repository is a LangChain-based RAG chatbot demo that combines
-unstructured semantic search (OpenAI embeddings + Neo4j vector index)
-and structured Text-to-Cypher query generation against a Neo4j graph.
-The system is divided into small Docker services (ETL, API, frontend, portal)
-defined in `docker-compose.yml`.
+unstructured semantic search (local embeddings + Neo4j vector index or FAISS)
+and structured Text-to-Cypher query generation against a Neo4j graph. The
+example dataset and UI have been adapted to a law-firm domain (attorneys,
+clients, cases, legal documents) instead of the original hospital demo.
 
 ## Big-picture architecture
 

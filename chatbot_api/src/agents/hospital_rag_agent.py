@@ -103,11 +103,10 @@ agent_prompt = ChatPromptTemplate.from_messages(
         (
             "system",
             """
-            You are a helpful chatbot designed to answer questions
-            about patient experiences, patient data, hospitals,
-            insurance payers, patient review statistics, hospital
-            visit details, wait times, and availability for
-            stakeholders in a hospital system.
+                You are a helpful chatbot designed to answer questions
+                about attorneys, clients, case notes, legal documents,
+                billing, and firm operations. The environment models a law
+                firm office with attorneys, secretaries, and legal libraries.
             """,
         ),
         ("user", "{input}"),

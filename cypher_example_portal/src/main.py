@@ -13,15 +13,15 @@ with st.sidebar:
     st.markdown(
         """
     This app allows you to add example questions and their corresponding
-    Cypher queries to a vector index used by the
-    [Hospital System Chatbot](https://github.com/hfhoffman1144/langchain_neo4j_rag_app).
+    Cypher queries to the vector index used by the
+    law-firm chatbot. When the chatbot generates Cypher queries it dynamically
+    retrieves semantically similar example questions and their corresponding
+    Cypher queries from the vector index. This context helps the chatbot
+    generate more accurate queries against firm data (attorneys, clients,
+    cases, billing, documents).
 
-    When you ask the chatbot to generate Cypher queries, it dynamically retrieves
-    semantically similar questions and their corresponding Cypher queries from the
-    vector index. This context helps the chatbot generate more accurate queries.
-
-    If the chatbot generates an incorrect query for a question, and
-    you know the correct query, add it here!
+    If the chatbot generates an incorrect query for a question, and you know
+    the correct query, add it here!
     """
     )
 

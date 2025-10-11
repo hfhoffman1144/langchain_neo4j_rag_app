@@ -10,55 +10,23 @@ with st.sidebar:
         """
         This chatbot interfaces with a
         [LangChain](https://python.langchain.com/docs/get_started/introduction)
-        agent designed to answer questions about the hospitals, patients,
-        visits, physicians, and insurance payers in  a fake hospital system.
-        The agent uses  retrieval-augment generation (RAG) over both
-        structured and unstructured data that has been synthetically generated.
+        agent designed to answer questions about attorneys, clients,
+        cases, legal documents, firm billing, and practice-area knowledge
+        for a simulated law firm. The agent uses retrieval-augmented
+        generation (RAG) over both structured and unstructured firm data.
         """
     )
 
     st.header("Example Questions")
-    st.markdown("- Which hospitals are in the hospital system?")
-    st.markdown("""- What is the current wait time at wallace-hamilton hospital?""")
-    st.markdown(
-        """- At which hospitals are patients complaining about billing and
-        insurance issues?"""
-    )
-    st.markdown("- What is the average duration in days for closed emergency visits?")
-    st.markdown(
-        """- What are patients saying about the nursing staff at
-        Castaneda-Hardy?"""
-    )
-    st.markdown("- What was the total billing amount charged to each payer for 2023?")
-    st.markdown("- What is the average billing amount for medicaid visits?")
-    st.markdown("- Which physician has the lowest average visit duration in days?")
-    st.markdown("- How much was billed for patient 789's stay?")
-    st.markdown(
-        """- Which state had the largest percent increase in medicaid visits
-        from 2022 to 2023?"""
-    )
-    st.markdown("- What is the average billing amount per day for Aetna patients?")
-    st.markdown(
-        """- How many reviews have been written from
-                patients in Florida?"""
-    )
-    st.markdown(
-        """- For visits that are not missing chief complaints,
-       what percentage have reviews?"""
-    )
-    st.markdown(
-        """- What is the percentage of visits that have reviews for
-        each hospital?"""
-    )
-    st.markdown(
-        """- Which physician has received the most reviews for this visits
-        they've attended?"""
-    )
-    st.markdown("- What is the ID for physician James Cooper?")
-    st.markdown(
-        """- List every review for visits treated by physician 270.
-        Don't leave any out."""
-    )
+    st.markdown("- Which attorneys are in the firm?")
+    st.markdown("- Show open cases for client 'Acme Corp' and assigned attorney")
+    st.markdown("- Which cases have billing disputes in the last quarter?")
+    st.markdown("- What does the case note for case #1234 say about the discovery timeline?")
+    st.markdown("- Summarize recent legal memos about employment law in our library")
+    st.markdown("- What is the total billed amount by attorney for 2024?")
+    st.markdown("- Which attorney has the most cases in the corporate practice area?")
+    st.markdown("- Find client contact info for 'Jane Doe'")
+    st.markdown("- List all documents mentioning 'non-compete' for client X")
 
 
 st.title("Hospital System Chatbot")
