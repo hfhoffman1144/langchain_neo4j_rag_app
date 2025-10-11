@@ -67,6 +67,21 @@ st.info(
     physicians, reviews, and wait times!"""
 )
 
+
+st.header("Upload DOCX (for RAG over custom documents)")
+uploaded_file = st.file_uploader("Upload a .docx file to add to the agent's document store", type=["docx"])
+if uploaded_file is not None:
+    files = {"file": (uploaded_file.name, uploaded_file.getvalue(), uploaded_file.type)}
+    try:
+        resp = requests.post("http://localhost:8000/upload-docx", files=files)
+        if resp.status_code == 200:
+            st.success(f"Uploaded: {resp.json().get('id')}")
+            st.text(resp.json().get("text_snippet"))
+        else:
+            st.error(f"Upload failed: {resp.status_code} {resp.text}")
+    except Exception as e:
+        st.error(f"Error contacting the API: {e}")
+
 if "messages" not in st.session_state:
     st.session_state.messages = []
 

@@ -10,6 +10,9 @@ dependencies = [
     "langchainhub==0.1.14",
     "neo4j==5.14.1",
     "numpy==1.26.2",
+    "python-docx==0.8.12",
+    # faiss-cpu is optional; if unavailable tests will fall back to numpy-based search
+    "faiss-cpu==1.7.4",
     "openai==1.36.0",
     "opentelemetry-api==1.22.0",
     "pydantic==2.5.1",

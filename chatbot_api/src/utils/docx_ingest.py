@@ -9,6 +9,14 @@ from langchain_openai import OpenAIEmbeddings
 
 # Simple local store for uploaded docs: JSONL with {id, text, embedding}
 UPLOAD_STORE = os.getenv("UPLOAD_STORE_PATH", "./data/uploaded_docs.jsonl")
+USE_FAISS = os.getenv("UPLOAD_USE_FAISS", "false").lower() in ("1", "true", "yes")
+FAISS_INDEX_PATH = os.getenv("FAISS_INDEX_PATH", "./data/faiss_index.npz")
+
+if USE_FAISS:
+    try:
+        import faiss
+    except Exception:
+        faiss = None
 
 
 def _ensure_store_dir(path: str):
@@ -34,6 +42,26 @@ def embed_and_store(text: str, doc_id: str) -> dict:
     with open(UPLOAD_STORE, "a", encoding="utf-8") as fh:
         fh.write(json.dumps(entry) + "\n")
 
+    # If FAISS mode enabled, append to a simple FAISS index
+    if USE_FAISS and faiss is not None:
+        # load existing index
+        try:
+            npz = np.load(FAISS_INDEX_PATH, allow_pickle=True)
+            mat = npz["embeddings"]
+            ids = list(npz["ids"])
+        except Exception:
+            mat = None
+            ids = []
+
+        vec = np.array(embedding, dtype=np.float32)
+        if mat is None:
+            mat = vec.reshape(1, -1)
+        else:
+            mat = np.vstack([mat, vec.reshape(1, -1)])
+
+        ids.append(doc_id)
+        np.savez(FAISS_INDEX_PATH, embeddings=mat, ids=np.array(ids, dtype=object))
+
     return entry
 
 
@@ -52,6 +80,31 @@ def load_uploaded_entries() -> List[dict]:
 
 def simple_search(query: str, k: int = 5) -> List[dict]:
     """Brute-force cosine similarity search over uploaded entries."""
+    # If FAISS is enabled and available, load FAISS-like numpy store
+    if USE_FAISS and os.path.exists(FAISS_INDEX_PATH):
+        try:
+            npz = np.load(FAISS_INDEX_PATH, allow_pickle=True)
+            mat = npz["embeddings"]
+            ids = list(npz["ids"])
+            emb = OpenAIEmbeddings()
+            q_emb = np.array(emb.embed_query(query), dtype=float)
+
+            sims = mat @ q_emb
+            norms = np.linalg.norm(mat, axis=1) * (np.linalg.norm(q_emb) + 1e-10)
+            scores = sims / norms
+            idx = np.argsort(scores)[::-1][:k]
+            entries = load_uploaded_entries()
+            out = []
+            for i in idx:
+                doc_id = ids[i]
+                for e in entries:
+                    if e["id"] == doc_id:
+                        out.append(e)
+                        break
+            return out
+        except Exception:
+            pass
+
     entries = load_uploaded_entries()
     if not entries:
         return []
