@@ -12,6 +12,9 @@ from langchain.prompts import (
 from src.utils.docx_ingest import simple_search
 from langchain.chains import LLMChain
 from langchain.schema import Document
+from src.utils.ollama_llm import generate_with_ollama
+
+USE_OLLAMA = os.getenv("USE_OLLAMA", "false").lower() in ("1", "true", "yes")
 
 HOSPITAL_QA_MODEL = os.getenv("HOSPITAL_QA_MODEL")
 
@@ -52,12 +55,26 @@ review_prompt = ChatPromptTemplate(
     input_variables=["context", "question"], messages=messages
 )
 
-reviews_vector_chain = RetrievalQA.from_chain_type(
-    llm=ChatOpenAI(model=HOSPITAL_QA_MODEL, temperature=0),
-    chain_type="stuff",
-    retriever=neo4j_vector_index.as_retriever(k=12),
-)
-reviews_vector_chain.combine_documents_chain.llm_chain.prompt = review_prompt
+if USE_OLLAMA:
+    # Simple wrapper LLMChain for Ollama: use LLMChain with a callable that calls generate_with_ollama
+    def _ollama_run(inputs: dict) -> str:
+        prompt_text = review_prompt.format(context=inputs.get("context", ""), question=inputs.get("question", ""))
+        return generate_with_ollama(prompt_text, model=os.getenv("HOSPITAL_QA_MODEL"))
+
+    reviews_vector_chain = RetrievalQA.from_chain_type(
+        llm=ChatOpenAI(model=HOSPITAL_QA_MODEL, temperature=0),
+        chain_type="stuff",
+        retriever=neo4j_vector_index.as_retriever(k=12),
+    )
+    # Keep prompt on the combine chain but the actual generation will be routed via generate_with_ollama in uploaded_reviews_chain
+    reviews_vector_chain.combine_documents_chain.llm_chain.prompt = review_prompt
+else:
+    reviews_vector_chain = RetrievalQA.from_chain_type(
+        llm=ChatOpenAI(model=HOSPITAL_QA_MODEL, temperature=0),
+        chain_type="stuff",
+        retriever=neo4j_vector_index.as_retriever(k=12),
+    )
+    reviews_vector_chain.combine_documents_chain.llm_chain.prompt = review_prompt
 
 
 def uploaded_docs_retriever(question: str) -> str:
