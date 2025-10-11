@@ -8,7 +8,7 @@ from langchain.prompts import (
 )
 from langchain_core.output_parsers import StrOutputParser
 from langchain_community.vectorstores import Chroma
-from langchain_openai import OpenAIEmbeddings
+from chatbot_api.src.utils.local_embeddings import LocalEmbeddings as OpenAIEmbeddings
 from langchain.schema.runnable import RunnablePassthrough
 from langchain.agents import create_openai_functions_agent, Tool, AgentExecutor
 from langchain import hub

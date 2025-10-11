@@ -3,7 +3,7 @@ from langchain_community.graphs import Neo4jGraph
 from langchain_openai import ChatOpenAI
 from langchain.prompts import PromptTemplate
 from langchain_community.vectorstores.neo4j_vector import Neo4jVector
-from langchain_openai import OpenAIEmbeddings
+from src.utils.local_embeddings import LocalEmbeddings as OpenAIEmbeddings
 from src.langchain_custom.graph_qa.cypher import GraphCypherQAChain
 
 NEO4J_URI = os.getenv("NEO4J_URI")

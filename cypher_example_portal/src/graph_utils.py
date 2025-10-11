@@ -1,6 +1,6 @@
 import os
 from langchain_community.vectorstores.neo4j_vector import Neo4jVector
-from langchain_openai import OpenAIEmbeddings
+from chatbot_api.src.utils.local_embeddings import LocalEmbeddings as OpenAIEmbeddings
 from langchain_community.graphs import Neo4jGraph
 
 NEO4J_URI = os.getenv("NEO4J_URI")
