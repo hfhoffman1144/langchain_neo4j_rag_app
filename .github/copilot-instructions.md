@@ -44,6 +44,12 @@ docker-compose up --build
 - Neo4j (configured via `NEO4J_URI`, `NEO4J_USERNAME`, `NEO4J_PASSWORD`) — ETL expects access to a Neo4j database and uses `neo4j` driver to load CSVs.
 - OpenAI (configured via `OPENAI_API_KEY`) — used for embeddings and LLM calls (`langchain_openai.ChatOpenAI`).
 - Docker & Docker Compose wire services together and provide `host.docker.internal` for cross-container access to host URLs.
+ - Ollama / local LLM: this repo can optionally use a locally-hosted Ollama HTTP server (e.g. llama3.2). Set `USE_OLLAMA=true` and `OLLAMA_URL` (e.g. `http://ollama:11434`) to route some chain LLM calls to Ollama. The review chain supports this via `USE_OLLAMA`.
+
+Environment variables related to local LLMs:
+
+- USE_OLLAMA=true|false — when true, certain chain generation is routed to the local Ollama HTTP API.
+- OLLAMA_URL — base URL for the Ollama HTTP API (default: http://localhost:11434). In Docker use the Ollama service name as host (for example `http://ollama:11434`).
 
 ## Tests & quick checks
 
